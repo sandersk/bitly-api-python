@@ -52,5 +52,5 @@ def testBundleCreate():
     description = "Testing API"
     access_token = "insert access token here"
     private = True
-    data = bitly.bundle_create(title, description, private)
+    data = bitly.bundle_create(title, description, private, access_token)
     assert data['status_code'] == 200

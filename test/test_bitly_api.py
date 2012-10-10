@@ -2,6 +2,7 @@
 """
 This is a py.test script
 """
+import datetime
 import sys
 sys.path.append('../')
 import bitly_api
@@ -42,3 +43,14 @@ def testProDomain():
             assert result == test_data[domain], domain
         except bitly_api.BitlyError, e:
             assert str(e) == test_data[domain]
+
+# Bundle tests
+
+def testBundleCreate():
+    bitly = bitly_api.Connection('bitlyapidemo','R_0da49e0a9118ff35f52f629d2d71bf07')
+    title = "Test Bundle  " + datetime.datetime.today().strftime("%Y%m%d%H%M%S")
+    description = "Testing API"
+    access_token = "insert access token here"
+    private = True
+    data = bitly.bundle_create(title, description, private)
+    assert data['status_code'] == 200

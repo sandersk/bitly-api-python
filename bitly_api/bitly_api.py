@@ -29,7 +29,7 @@ class Connection(object):
         c.shorten('http://www.google.com/')
     """
     def __init__(self, login, api_key, secret=None, preferred_domain='bit.ly'):
-        self.host = 'api.bit.ly'
+        self.host = 'api-ssl.bit.ly'
         self.preferred_domain = preferred_domain # bit.ly or j.mp
         self.login = login
         self.api_key = api_key
@@ -202,6 +202,22 @@ class Connection(object):
         data = self._call(self.host, end_point, params, self.secret)
         return data['data']['bitly_pro_domain']
 
+    # Bit.ly Bundle methods
+    def bundle_create(self, title=None, description=None, private=False, access_token=None):
+        """Create a new bundle for the bitly account. title and description are optional; privacy defaults to False"""
+        if not access_token:
+            raise BitlyError(500, 'MISSING_ACCESS_TOKEN')
+        params = {
+            'access_token': access_token
+        }
+        if title:
+            params['title'] = title
+        if description:
+            params['description'] = description
+            
+        data = self._call(self.host, 'v3/bundle/create', params)
+        return data
+
     @classmethod
     def _generateSignature(self, params, secret):
         if not params or not secret:
@@ -240,7 +256,7 @@ class Connection(object):
             encoded_params.append((k,v))
         params = dict(encoded_params)
         
-        request = "http://%(host)s/%(method)s?%(params)s" % {
+        request = "https://%(host)s/%(method)s?%(params)s" % {
             'host':host,
             'method':method,
             'params':urllib.urlencode(params, doseq=1)

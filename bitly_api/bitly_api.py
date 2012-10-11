@@ -233,7 +233,7 @@ class Connection(object):
         if not params['access_token']:
             raise BitlyError(500, 'MISSING_ACCESS_TOKEN')
             
-        data = self._call(self.host, 'v3/bundle/create', params)
+        data = self._call(self.host, 'v3/bundle/link_add', params)
         return data['data']
 
     @classmethod

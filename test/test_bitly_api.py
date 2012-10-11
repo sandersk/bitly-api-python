@@ -51,6 +51,13 @@ def testBundleCreate():
     title = "Test Bundle  " + datetime.datetime.today().strftime("%Y%m%d%H%M%S")
     description = "Testing API"
     access_token = "insert access token here"
-    private = True
     data = bitly.bundle_create(title, description, private, access_token)
-    assert data['status_code'] == 200
+    assert data != None
+
+def testBundleAddLink():
+    bitly = bitly_api.Connection('bitlyapidemo','R_0da49e0a9118ff35f52f629d2d71bf07')
+    bundle_url = "http://bitly.com/bundles/bitlyapidemo/1"
+    url_to_add = "http://google.com/"
+    access_token = "insert access token here"
+    data = bitly.bundle_add_link(bundle_url, url_to_add, access_token)
+    assert data['data'] != None

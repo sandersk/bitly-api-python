@@ -28,12 +28,13 @@ class Connection(object):
         c = bitly_api.Connection('bitlyapidemo','R_{{apikey}}')
         c.shorten('http://www.google.com/')
     """
-    def __init__(self, login, api_key, secret=None, preferred_domain='bit.ly'):
+    def __init__(self, login, api_key, secret=None, preferred_domain='bit.ly', access_token=None):
         self.host = 'api-ssl.bit.ly'
         self.preferred_domain = preferred_domain # bit.ly or j.mp
         self.login = login
         self.api_key = api_key
         self.secret = secret
+        self.access_token = access_token
         (major, minor, micro, releaselevel, serial) = sys.version_info
         self.user_agent = "Python/%d.%d.%d bitly_api/%s" % (major, minor, micro, '?')
     
@@ -203,20 +204,37 @@ class Connection(object):
         return data['data']['bitly_pro_domain']
 
     # Bit.ly Bundle methods
-    def bundle_create(self, title=None, description=None, private=False, access_token=None):
+    def bundle_create(self, title=None, description=None, private=False, x_access_token=None):
         """Create a new bundle for the bitly account. title and description are optional; privacy defaults to False"""
-        if not access_token:
-            raise BitlyError(500, 'MISSING_ACCESS_TOKEN')
         params = {
-            'access_token': access_token
+            'access_token': self.access_token
         }
+        if x_access_token:
+            params.update({'access_token':x_access_token})
+        if not params['access_token']:
+            raise BitlyError(500, 'MISSING_ACCESS_TOKEN')
         if title:
             params['title'] = title
         if description:
             params['description'] = description
             
         data = self._call(self.host, 'v3/bundle/create', params)
-        return data
+        return data['data']
+
+    def bundle_add_link(self, bundle_url, url_to_add, x_access_token=None):
+        """Create a new bundle for the bitly account. title and description are optional; privacy defaults to False"""
+        params = {
+            'access_token': self.access_token,
+            'bundle_link': bundle_url,
+            'link': url_to_add
+        }
+        if x_access_token:
+            params.update({'access_token':x_access_token})
+        if not params['access_token']:
+            raise BitlyError(500, 'MISSING_ACCESS_TOKEN')
+            
+        data = self._call(self.host, 'v3/bundle/create', params)
+        return data['data']
 
     @classmethod
     def _generateSignature(self, params, secret):
